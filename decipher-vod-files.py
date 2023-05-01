@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import time
 import json
 import os
+import re
 from urllib.parse import urlparse
 from pathlib import Path
 from boto3.dynamodb.conditions import Key, Attr
@@ -90,7 +91,10 @@ def lambda_handler(event, context):
             print(item_stem)
             table_name = response['TableNames'][0]
             print(table_name)
-            table_item = item_stem[0]
+            # table_item = item_stem[0]
+            temp = re.findall(r'\d+', item_stem)
+            table_item = temp[0]
+            print(table_item)
             dynamodb = boto3.resource('dynamodb')
             table = dynamodb.Table(table_name)
             response = table.scan(
