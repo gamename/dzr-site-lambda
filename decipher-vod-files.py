@@ -2,6 +2,7 @@
 This script will be used to decipher the VOD files that are stored in the S3 bucket.
 """
 import json
+import re
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -121,7 +122,10 @@ def handle_simple_table_model(stem, table):
     print(stem)
     item_stem = remove_char(stem, 0)
     print(item_stem)
-    response = table.scan(FilterExpression=Attr('Name').eq(item_stem))
+    temp = re.findall(r'\d+', item_stem)
+    table_item_number = temp[0]
+    print(table_item_number)
+    response = table.scan(FilterExpression=Attr('Number').eq(table_item_number))
     data = response['Items'][0]
     print(data)
     return data
