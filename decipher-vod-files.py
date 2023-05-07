@@ -1,3 +1,6 @@
+"""
+This script will be used to decipher the VOD files that are stored in the S3 bucket.
+"""
 import json
 from pathlib import Path
 from urllib.parse import urlparse
@@ -66,7 +69,7 @@ def get_stub(file_url):
     """
     file_name = urlparse(file_url).path.split('/')[-1]
     print(file_name)
-    return Path(file_name).stem
+    return Path(str(file_name)).stem
 
 
 def extract_stub_list(variations):
