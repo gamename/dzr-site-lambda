@@ -1,12 +1,12 @@
-import boto3
-from datetime import datetime, timedelta
-import time
 import json
-import os
 import re
-from urllib.parse import urlparse
 from pathlib import Path
-from boto3.dynamodb.conditions import Key, Attr
+from urllib.parse import urlparse
+
+import boto3
+from boto3.dynamodb.conditions import Attr
+
+REMOVE_ALL_TECHNIQUE_VARIATIONS = 'z'
 
 
 def remove_char(a_str, n):
@@ -206,10 +206,7 @@ def handle_danzan_ryu(file_stem, file_url):
     table = dynamodb.Table(table_name)
     data = handle_scroll(scroll, file_stem, table)
     print("final file stem: ", file_stem)
-    #
-    # Special case to remove technique list
-    #
-    if file_stem.endswith('z'):
+    if file_stem.endswith(REMOVE_ALL_TECHNIQUE_VARIATIONS):
         reset_technique_list(data, table)
     else:
         update_technique_list(data, table, file_url)
