@@ -37,7 +37,9 @@ def get_scroll_id(scroll_char):
         'n': 'basic_nage',
         'g': 'goshin',
         's': 'shime',
-        'w': 'basic_weapons',
+        't': 'basic_stick',
+        'f': 'basic_knife',
+        'u': 'basic_handgun',
         'k': 'kdm',
         'o': 'oku',
         'i': 'shinin',
@@ -49,6 +51,23 @@ def get_scroll_id(scroll_char):
         'x': 'exercises'
     }
     return scroll_dict[scroll_char]
+
+
+def get_weapon_id(weapon_char):
+    """
+    Identify the weapon we are processing by using a single character
+    which was embedded in the file name
+
+    :param weapon_char: A single character from the file name
+    :return: the weapon name
+    """
+    weapon_dict = {
+        't': 'stick',
+        'f': 'knife',
+        'u': 'handgun',
+        'r': 'rifle'
+    }
+    return weapon_dict[weapon_char]
 
 
 def convert_to_camel_case(string):
@@ -73,41 +92,15 @@ def get_stub(file_url):
     return Path(str(file_name)).stem
 
 
-def extract_stub_list(variations):
+def sort_url_by_stub(url_list):
     """
-    Extract the list of file stubs from the list of urls in variations list
+    Sort the list of urls by the stub
 
-    :param variations: The variations
-    :return: The list of stubs
+    :param url_list: The list of urls
+    :return: The sorted list of urls
     """
-    stub_list = []
-    for variation in variations:
-        print(variation)
-        stub = get_stub(variation)
-        stub_list.append(stub)
-    return stub_list
-
-
-def update_variations(data, file_url):
-    """
-    Update the variations list with the new file url. If the file url
-    is already in the list, then update the entry. If the file url is
-    not in the list, then add the file url to the list.
-
-    :param data: The data dictionary
-    :param file_url: The file url to add to the variations list
-    :return: The updated data dictionary
-    """
-    new_stub = get_stub(file_url)
-    stub_list = extract_stub_list(data['Variations'])
-    if new_stub in stub_list:
-        print(f'Updating existing entry: {new_stub}')
-        for i, stub in enumerate(stub_list):
-            if stub == new_stub:
-                data['Variations'][i] = file_url
-    else:
-        data['Variations'].append(file_url)
-    return data
+    url_list.sort(key=get_stub)
+    return url_list
 
 
 def handle_simple_table_model(stem, table):
@@ -166,13 +159,55 @@ def handle_exercises(file_stem, ddb_table):
 
 def handle_basic_weapons(file_stem, ddb_table):
     """
-    Handle the basic weapons list
+    Handle the basic weapons lists
 
     :param file_stem: File name fragment that dictates how the db is updated
     :param ddb_table: The DynamoDB table
     :return: The data dictionary
     """
-    pass
+    item_stem = remove_char(file_stem, 0)
+    set_number = item_stem[0]
+    print(set_number)
+    technique_number = item_stem[1]
+    print(technique_number)
+    response = ddb_table.scan(
+        FilterExpression=Attr('Set').eq(set_number) & Attr('Number').eq(technique_number))
+    data = response['Items'][0]
+    print(data)
+    return data
+
+
+def handle_basic_stick(file_stem, ddb_table):
+    """
+    Handle the basic stick list
+
+    :param file_stem: File name fragment that dictates how the db is updated
+    :param ddb_table: The DynamoDB table
+    :return: The data dictionary
+    """
+    return handle_basic_weapons(file_stem, ddb_table)
+
+
+def handle_basic_knife(file_stem, ddb_table):
+    """
+    Handle the basic knife list
+
+    :param file_stem: File name fragment that dictates how the db is updated
+    :param ddb_table: The DynamoDB table
+    :return: The data dictionary
+    """
+    return handle_basic_weapons(file_stem, ddb_table)
+
+
+def handle_basic_handgun(file_stem, ddb_table):
+    """
+    Handle the basic handgun list
+
+    :param file_stem: File name fragment that dictates how the db is updated
+    :param ddb_table: The DynamoDB table
+    :return: The data dictionary
+    """
+    return handle_basic_weapons(file_stem, ddb_table)
 
 
 def handle_advanced_weapons(file_stem, ddb_table):
@@ -183,7 +218,14 @@ def handle_advanced_weapons(file_stem, ddb_table):
     :param ddb_table: The DynamoDB table
     :return: The data dictionary
     """
-    pass
+    weapon = get_weapon_id(file_stem[1])
+    print(weapon)
+    number = file_stem[2]
+    response = ddb_table.scan(
+        FilterExpression=Attr('Weapon').eq(weapon) & Attr('Number').eq(number))
+    data = response['Items'][0]
+    print(data)
+    return data
 
 
 def handle_kdm(file_stem, ddb_table):
@@ -294,9 +336,15 @@ def handle_scroll(scroll, file_stem, ddb_table):
     elif scroll == 'exercises':
         print("exercises")
         data = handle_exercises(file_stem, ddb_table)
-    elif scroll == 'basic_weapons':
-        print("basic weapons")
-        data = handle_basic_weapons(file_stem, ddb_table)
+    elif scroll == 'basic_stick':
+        print("basic stick")
+        data = handle_basic_stick(file_stem, ddb_table)
+    elif scroll == 'basic_knife':
+        print("basic knife")
+        data = handle_basic_knife(file_stem, ddb_table)
+    elif scroll == 'basic_handgun':
+        print("basic handgun")
+        data = handle_basic_handgun(file_stem, ddb_table)
     elif scroll == 'advanced_weapons':
         print("advanced weapons")
         data = handle_advanced_weapons(file_stem, ddb_table)
@@ -325,7 +373,7 @@ def handle_scroll(scroll, file_stem, ddb_table):
         print("goshin")
         data = handle_goshin(file_stem, ddb_table)
     else:
-        raise Exception("Unknown scroll: "+scroll)
+        raise Exception("Unknown scroll: " + scroll)
 
     return data
 
@@ -350,6 +398,21 @@ def get_db_table_name_for_scroll(scroll_name):
     return table_name
 
 
+def extract_stub_list(variations):
+    """
+    Extract the list of file stubs from the list of urls in variations list
+
+    :param variations: The variations
+    :return: The list of stubs
+    """
+    stub_list = []
+    for variation in variations:
+        print(variation)
+        stub = get_stub(variation)
+        stub_list.append(stub)
+    return stub_list
+
+
 def update_technique_list(data, table, file_url):
     """
     Update the technique list in the DynamoDB table
@@ -359,14 +422,22 @@ def update_technique_list(data, table, file_url):
     :param file_url: The file URL to add to the list of variations in the data dictionary.
     :return: Nothing
     """
-    if not data['Variations']:
-        data['Variations'] = [file_url]
-        put_response = table.put_item(Item=data)
-        print(put_response)
+
+    # data = update_variations(data, file_url)
+    new_stub = get_stub(file_url)
+    stub_list = extract_stub_list(data['Variations'])
+    if new_stub in stub_list:
+        print(f'Updating existing entry: {new_stub}')
+        for i, stub in enumerate(stub_list):
+            if stub == new_stub:
+                data['Variations'][i] = file_url
     else:
-        data = update_variations(data, file_url)
-        update_response = table.put_item(Item=data)
-        print(update_response)
+        print(f'Adding new entry: {new_stub}')
+        data['Variations'].append(file_url)
+
+    data['Variations'] = sort_url_by_stub(data['Variations'])
+    put_response = table.put_item(Item=data)
+    print(put_response)
 
 
 def reset_technique_list(data, table):
@@ -378,10 +449,9 @@ def reset_technique_list(data, table):
     :param table: The DynamoDB table
     :return: Nothing
     """
-    if data['Variations']:
-        data['Variations'] = []
-        put_response = table.put_item(Item=data)
-        print(put_response)
+    data['Variations'] = []
+    put_response = table.put_item(Item=data)
+    print(put_response)
 
 
 def handle_danzan_ryu(file_stem, file_url):
@@ -414,7 +484,7 @@ def lambda_handler(event, context):
     :return: Nothing
     """
     if "Complete" in event['Records'][0]['Sns']['Subject']:
-        print("Complete notification detected")
+        print("'Complete' type notification detected")
         print(event)
         file_url = json.loads(event['Records'][0]['Sns']['Message'])['hlsUrl']
         print(file_url)
@@ -426,7 +496,7 @@ def lambda_handler(event, context):
             print(new_stem)
             handle_danzan_ryu(new_stem, file_url)
         else:
-            raise Exception("Invalid video file name: "+file_stem)
+            raise Exception("Invalid video file name: " + file_stem)
     else:
-        print("Ingest message detected. Ignoring")
+        print("'Ingest' type message detected. Ignoring")
     return

@@ -1,0 +1,11 @@
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 300
+      MemorySize: 512
+      Handler: decipher-vod-files.lambda_handler
+      CodeUri: /Users/tennis/PycharmProjects/dzr-site-lambda
+      Runtime: python3.8
+      Architectures:
+        - x86_64
