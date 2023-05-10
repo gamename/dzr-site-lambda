@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:657592885771:dzr-vod-SnsTopic2C1570A4-pnV1zVWvQUob:26aa4786-e507-4059-a491-c974d2f0db9c",
+      "Sns": {
+        "Type": "Notification",
+        "MessageId": "79e4f5ac-5401-532a-af6c-a96a1e90e80e",
+        "TopicArn": "arn:aws:sns:us-east-1:657592885771:dzr-vod-SnsTopic2C1570A4-pnV1zVWvQUob",
+        "Subject": "Workflow Status:: Complete:: 6a0a80c4-92fb-4d6e-8f2b-7361f77a7102",
+        "Message": "{\n  \"encodeJobId\": \"1682720832157-hj5yf7\",\n  \"frameCapture\": false,\n  \"acceleratedTranscoding\": \"PREFERRED\",\n  \"workflowTrigger\": \"Video\",\n  \"cloudFront\": \"d31wdw3aqdh96.cloudfront.net\",\n  \"archiveSource\": \"DISABLED\",\n  \"enableSqs\": true,\n  \"srcBucket\": \"dzr-vod-source71e471f1-14049xi2rloei\",\n  \"inputRotate\": \"DEGREE_0\",\n  \"srcWidth\": 1920,\n  \"destBucket\": \"dzr-vod-destination920a3c57-153owrh596e67\",\n  \"workflowStatus\": \"Complete\",\n  \"workflowName\": \"dzr-vod\",\n  \"encodingProfile\": 1080,\n  \"isCustomTemplate\": false,\n  \"startTime\": \"2023-04-28T22:26:58.836Z\",\n  \"enableMediaPackage\": false,\n  \"jobTemplate\": \"dzr-vod_Ott_1080p_Avc_Aac_16x9_qvbr_no_preset\",\n  \"enableSns\": true,\n  \"srcVideo\": \"dkp4a.mov\",\n  \"srcHeight\": 1080,\n  \"endTime\": \"2023-04-28T22:27:26.110Z\",\n  \"hlsPlaylist\": \"s3://dzr-vod-destination920a3c57-153owrh596e67/6a0a80c4-92fb-4d6e-8f2b-7361f77a7103/hls/dkp4a.m3u8\",\n  \"hlsUrl\": \"https://d31wdw3aqdh96.cloudfront.net/6a0a80c4-92fb-4d6e-8f2b-7361f77a7103/hls/dkp4a.m3u8\",\n  \"guid\": \"6a0a80c4-92fb-4d6e-8f2b-7361f77a7102\"\n}",
+        "Timestamp": "2023-04-28T22:27:29.369Z",
+        "SignatureVersion": "1",
+        "Signature": "UDE3iHxz5bN0Y3Ac2n5L8sGd1qqai4tcxrjsjL4G+NOEk+gbgB122xigXFRGiGOMlq2n/tNHCLDLIlZPOvXvj+WaPPmqlsrdy+8AL2Hmaootjo2DaiFinkSo8mRLYZPMMSxKms/nyZtk9t3dpo+nVmXbYH1lfE2USREupu8VoBGC44jMJi8p3wF80W8R7o7t0qLdEAh41n4NCBLazEnnjWNpADldBOpGYyllv32614vS6FYgYpbpnqPVPqBkPgn6VtWpxKBvqsp5Bw7UCoVodj4rrKIlKMIGwJQppn4Y25TuBRe+iANulT4M5J/KuHPK3JYd4I99Yv8vc33juxaeYQ==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-56e67fcb41f6fec09b0196692625d385.pem",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:657592885771:dzr-vod-SnsTopic2C1570A4-pnV1zVWvQUob:26aa4786-e507-4059-a491-c974d2f0db9c",
+        "MessageAttributes": {}
+      }
+    }
+  ]
+}

@@ -70,6 +70,38 @@ def get_weapon_id(weapon_char):
     return weapon_dict[weapon_char]
 
 
+def get_kdm_id(kdm_char):
+    """
+    Identify the KDM we are processing by using a single character
+    which was embedded in the file name
+
+    :param kdm_char: A single character from the file name
+    :return: the KDM name
+    """
+    kdm_dict = {
+        'p': 'punch',
+        'k': 'kick',
+        'i': 'kick_defense',
+        'u': 'punch_defense',
+    }
+    return kdm_dict[kdm_char]
+
+
+def get_goshin_id(goshin_char):
+    """
+    Identify the goshin we are processing by using a single character
+    which was embedded in the file name
+
+    :param goshin_char: A single character from the file name
+    :return: the goshin name
+    """
+    goshin_dict = {
+        'i': 'inside',
+        'o': 'outside'
+    }
+    return goshin_dict[goshin_char]
+
+
 def convert_to_camel_case(string):
     """
     Convert a string to camel case
@@ -236,7 +268,14 @@ def handle_kdm(file_stem, ddb_table):
     :param ddb_table: The DynamoDB table
     :return: The data dictionary
     """
-    pass
+    drill_type = get_kdm_id(file_stem[1])
+    print(drill_type)
+    number = file_stem[2]
+    response = ddb_table.scan(
+        FilterExpression=Attr('DrillType').eq(drill_type) & Attr('Number').eq(number))
+    data = response['Items'][0]
+    print(data)
+    return data
 
 
 def handle_oku(file_stem, ddb_table):
@@ -258,7 +297,15 @@ def handle_shime(file_stem, ddb_table):
     :param ddb_table: The DynamoDB table
     :return: The data dictionary
     """
-    pass
+    flow_number = file_stem[1]
+    print(flow_number)
+    technique_letter = file_stem[2]
+    print(technique_letter)
+    response = ddb_table.scan(FilterExpression=Attr('GroundFlowNumber').eq(flow_number) &
+                                               Attr('Letter').eq(technique_letter))
+    data = response['Items'][0]
+    print(data)
+    return data
 
 
 def handle_shinin(file_stem, ddb_table):
@@ -280,7 +327,13 @@ def handle_goshin(file_stem, ddb_table):
     :param ddb_table: The DynamoDB table
     :return: The data dictionary
     """
-    pass
+    entering_direction = get_goshin_id(file_stem[1])
+    number = file_stem[2]
+    response = ddb_table.scan(
+        FilterExpression=Attr('Enter').eq(entering_direction) & Attr('Number').eq(number))
+    data = response['Items'][0]
+    print(data)
+    return data
 
 
 def handle_basic_nage(file_stem, ddb_table):
@@ -386,7 +439,12 @@ def get_db_table_name_for_scroll(scroll_name):
     :param scroll_name: The scroll name
     :return: The name of the DynamoDB table that contains information about the scroll.
     """
-    scroll_camel_case = convert_to_camel_case(scroll_name)
+    #
+    # Lengthen the scroll name so that there is no chance of small names like 'oku' or 'kdm'
+    # being accidentally found in the random chars in a different table name.
+    long_scroll_name = scroll_name + "_model"
+    #
+    scroll_camel_case = convert_to_camel_case(long_scroll_name)
     print(scroll_camel_case)
     ddb_client = boto3.client('dynamodb')
     response = ddb_client.list_tables(
