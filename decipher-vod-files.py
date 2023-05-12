@@ -34,21 +34,22 @@ def get_scroll_id(scroll_char):
     :return: the scroll name
     """
     scroll_dict = {
-        'n': 'basic_nage',
+        'a': 'advanced_weapons',
+        'd': 'advanced_yawara',
+        'f': 'basic_knife',
         'g': 'goshin',
+        'i': 'shinin',
+        'j': 'aikijutsu_nage',
+        'k': 'kdm',
+        'm': 'daito_no_maki',
+        'n': 'basic_nage',
+        'o': 'oku',
         's': 'shime',
         't': 'basic_stick',
-        'f': 'basic_knife',
         'u': 'basic_handgun',
-        'k': 'kdm',
-        'o': 'oku',
-        'i': 'shinin',
         'v': 'advanced_nage',
-        'j': 'aikijutsu_nage',
-        'a': 'advanced_weapons',
-        'y': 'basic_yawara',
-        'd': 'advanced_yawara',
-        'x': 'exercises'
+        'x': 'exercises',
+        'y': 'basic_yawara'
     }
     return scroll_dict[scroll_char]
 
@@ -62,10 +63,10 @@ def get_weapon_id(weapon_char):
     :return: the weapon name
     """
     weapon_dict = {
-        't': 'stick',
         'f': 'knife',
-        'u': 'handgun',
-        'r': 'rifle'
+        'r': 'rifle',
+        't': 'stick',
+        'u': 'handgun'
     }
     return weapon_dict[weapon_char]
 
@@ -79,10 +80,10 @@ def get_kdm_id(kdm_char):
     :return: the KDM name
     """
     kdm_dict = {
-        'p': 'punch',
-        'k': 'kick',
         'i': 'kick_defense',
-        'u': 'punch_defense',
+        'k': 'kick',
+        'p': 'punch',
+        'u': 'punch_defense'
     }
     return kdm_dict[kdm_char]
 
@@ -369,7 +370,28 @@ def handle_aikijutsu_nage(file_stem, ddb_table):
     return handle_simple_table_model(file_stem, ddb_table)
 
 
-def handle_scroll(scroll, file_stem, ddb_table):
+def handle_daito_no_maki(file_stem, ddb_table):
+    """
+    Handle the daito no maki list
+
+    :param file_stem: File name fragment that dictates how the db is updated
+    :param ddb_table: The DynamoDB table
+    :return: The data dictionary
+    """
+    print("daito no maki")
+    group = file_stem[1]
+    temp = re.findall(r'\d+', file_stem)
+    number = temp[0]
+    print(number)
+    print(group)
+    response = ddb_table.scan(
+        FilterExpression=Attr('Group').eq(group) & Attr('Number').eq(number))
+    data = response['Items'][0]
+    print(data)
+    return data
+
+
+def select_scroll_handler(scroll, file_stem, ddb_table):
     """
     Handle scroll processing.  Each scroll is a string that indicates the
     way it should be processed.
@@ -425,6 +447,9 @@ def handle_scroll(scroll, file_stem, ddb_table):
     elif scroll == 'goshin':
         print("goshin")
         data = handle_goshin(file_stem, ddb_table)
+    elif scroll == 'daito_no_maki':
+        print("daito no maki")
+        data = handle_daito_no_maki(file_stem, ddb_table)
     else:
         raise Exception("Unknown scroll: " + scroll)
 
@@ -525,7 +550,7 @@ def handle_danzan_ryu(file_stem, file_url):
     table_name = get_db_table_name_for_scroll(scroll)
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
-    data = handle_scroll(scroll, file_stem, table)
+    data = select_scroll_handler(scroll, file_stem, table)
     print("final file stem: ", file_stem)
     if file_stem.endswith(REMOVE_ALL_TECHNIQUE_VARIATIONS):
         reset_technique_list(data, table)
