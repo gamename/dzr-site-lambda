@@ -38,6 +38,7 @@ def get_scroll_id(scroll_char):
         'd': 'advanced_yawara',
         'f': 'basic_knife',
         'g': 'goshin',
+        'h': 'shinyo',
         'i': 'shinin',
         'j': 'aikijutsu_nage',
         'k': 'kdm',
@@ -391,6 +392,17 @@ def handle_daito_no_maki(file_stem, ddb_table):
     return data
 
 
+def handle_shinyo(file_stem, ddb_table):
+    """
+    Handle the shinyo list
+
+    :param file_stem: File name fragment that dictates how the db is updated
+    :param ddb_table: The DynamoDB table
+    :return: The data dictionary
+    """
+    return handle_simple_table_model(file_stem, ddb_table)
+
+
 def select_scroll_handler(scroll, file_stem, ddb_table):
     """
     Handle scroll processing.  Each scroll is a string that indicates the
@@ -450,6 +462,9 @@ def select_scroll_handler(scroll, file_stem, ddb_table):
     elif scroll == 'daito_no_maki':
         print("daito no maki")
         data = handle_daito_no_maki(file_stem, ddb_table)
+    elif scroll == 'shinyo':
+        print("shinyo")
+        data = handle_shinyo(file_stem, ddb_table)
     else:
         raise Exception("Unknown scroll: " + scroll)
 
