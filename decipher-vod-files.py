@@ -49,6 +49,7 @@ def get_scroll_id(scroll_char):
         't': 'basic_stick',
         'u': 'basic_handgun',
         'v': 'advanced_nage',
+        'w': 'shime_groundflow',
         'x': 'exercises',
         'y': 'basic_yawara'
     }
@@ -301,10 +302,10 @@ def handle_shime(file_stem, ddb_table):
     """
     flow_number = file_stem[1]
     print(flow_number)
-    technique_letter = file_stem[2]
-    print(technique_letter)
+    technique_number = file_stem[2]
+    print(technique_number)
     response = ddb_table.scan(FilterExpression=Attr('GroundFlowNumber').eq(flow_number) &
-                                               Attr('Letter').eq(technique_letter))
+                                               Attr('Number').eq(technique_number))
     data = response['Items'][0]
     print(data)
     return data
@@ -403,6 +404,22 @@ def handle_shinyo(file_stem, ddb_table):
     return handle_simple_table_model(file_stem, ddb_table)
 
 
+def handle_shime_groundflow(file_stem, ddb_table):
+    """
+    Handle the shime groundflow list
+
+    :param file_stem: File name fragment that dictates how the db is updated
+    :param ddb_table: The DynamoDB table
+    :return: The data dictionary
+    """
+    flow_number = file_stem[1]
+    print(flow_number)
+    response = ddb_table.scan(FilterExpression=Attr('Number').eq(flow_number))
+    data = response['Items'][0]
+    print(data)
+    return data
+
+
 def select_scroll_handler(scroll, file_stem, ddb_table):
     """
     Handle scroll processing.  Each scroll is a string that indicates the
@@ -465,6 +482,9 @@ def select_scroll_handler(scroll, file_stem, ddb_table):
     elif scroll == 'shinyo':
         print("shinyo")
         data = handle_shinyo(file_stem, ddb_table)
+    elif scroll == 'shime_groundflow':
+        print("shime groundflow")
+        data = handle_shime_groundflow(file_stem, ddb_table)
     else:
         raise Exception("Unknown scroll: " + scroll)
 
